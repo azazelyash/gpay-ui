@@ -34,11 +34,15 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  provider: ^6.0.5
 
   # --------------------------------- Packages --------------------------------- #
   # Lottie Animation Package
   lottie: ^2.6.0
+  # Provider for State Management
+  provider: ^6.0.5
+  # Pin Input TextField
+  # flutter_otp_text_field: ^1.1.1
+  otp_text_field: ^1.1.3
 
 dev_dependencies:
   flutter_test:
