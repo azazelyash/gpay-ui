@@ -1,16 +1,15 @@
-# gpay_ui
+# GPay Clone - Flutter
 
-A new Flutter project.
+<img src="./assets/ProjectOutput.gif" alt="App Screenshot" height="500">
 
-## Getting Started
+## Introduction
 
-This project is a starting point for a Flutter application.
+This Flutter project is a clone of Google Pay (GPay), focusing on replicating the frontend UI and user experience. It provides an interactive user interface with a custom keyboard and animations to mimic the GPay app.
 
-A few resources to get you started if this is your first Flutter project:
+## Features
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Custom keyboard for entering payment amounts and other details.
+- Lottie animations for visual appeal.
+- Replicated GPay UI elements, including cards and transaction history.
+- Smooth animations and transitions for a seamless user experience.
+- Utilises Provider Package to create optimised application.

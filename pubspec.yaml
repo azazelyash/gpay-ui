@@ -42,8 +42,6 @@ dependencies:
   provider: ^6.0.5
   # Pin Input TextField
   pinput: ^3.0.1
-  # flutter_otp_text_field: ^1.1.1
-  # otp_text_field: ^1.1.3
 
 dev_dependencies:
   flutter_test:

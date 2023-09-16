@@ -30,4 +30,9 @@ class UpiPinService with ChangeNotifier {
       return false;
     }
   }
+
+  void clearUpiPin() {
+    upiPinController.clear();
+    notifyListeners();
+  }
 }
