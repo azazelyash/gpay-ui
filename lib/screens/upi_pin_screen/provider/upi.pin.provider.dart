@@ -1,10 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:otp_text_field/otp_field.dart';
 
 class UpiPinService with ChangeNotifier {
-  OtpFieldController upiPinController = OtpFieldController();
+  TextEditingController upiPinController = TextEditingController();
+  bool isObscure = true;
 
-  void addNumber(String number, int position) {
-    upiPinController.setValue(number, position);
+  void toggleObscure() {
+    isObscure = !isObscure;
+    notifyListeners();
+  }
+
+  void addNumber(String number) {
+    if (upiPinController.text.length < 4) {
+      upiPinController.text += number;
+      notifyListeners();
+    }
+  }
+
+  void removeNumber() {
+    if (upiPinController.text.length > 0) {
+      upiPinController.text = upiPinController.text.substring(0, upiPinController.text.length - 1);
+      notifyListeners();
+    }
+  }
+
+  bool isUpiPinValid() {
+    if (upiPinController.text.length == 4) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

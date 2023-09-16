@@ -8,8 +8,7 @@ import 'package:gpay_ui/screens/upi_pin_screen/components/upi.special.button.dar
 import 'package:gpay_ui/screens/upi_pin_screen/models/tax.model.dart';
 import 'package:gpay_ui/screens/upi_pin_screen/provider/dropdown.service.dart';
 import 'package:gpay_ui/screens/upi_pin_screen/provider/upi.pin.provider.dart';
-import 'package:otp_text_field/otp_field.dart';
-import 'package:otp_text_field/style.dart';
+import 'package:pinput/pinput.dart';
 import 'package:provider/provider.dart';
 
 class UpiPinScreen extends StatefulWidget {
@@ -132,10 +131,12 @@ class _UpiPinScreenState extends State<UpiPinScreen> {
                                   ),
                                 ),
                                 IconButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    value.toggleObscure();
+                                  },
                                   splashRadius: 25,
-                                  icon: const Icon(
-                                    Icons.remove_red_eye,
+                                  icon: Icon(
+                                    (value.isObscure) ? Icons.visibility_off : Icons.visibility,
                                     color: kUpiPinColor,
                                   ),
                                 ),
@@ -144,18 +145,10 @@ class _UpiPinScreenState extends State<UpiPinScreen> {
                             const SizedBox(height: 10),
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: OTPTextField(
-                                length: 6,
-                                width: MediaQuery.of(context).size.width / 1.4,
-                                fieldWidth: 40,
-                                keyboardType: TextInputType.none,
-                                style: const TextStyle(fontSize: 17),
-                                textFieldAlignment: MainAxisAlignment.spaceAround,
-                                fieldStyle: FieldStyle.underline,
+                              child: Pinput(
+                                obscureText: value.isObscure,
                                 controller: value.upiPinController,
-                                onCompleted: (pin) {
-                                  print("Completed: " + pin);
-                                },
+                                keyboardType: TextInputType.none,
                               ),
                             ),
                           ],
@@ -169,33 +162,100 @@ class _UpiPinScreenState extends State<UpiPinScreen> {
                             UpiPinButton(
                               text: "1",
                               onTap: () {
-                                value.addNumber("1", 1);
+                                value.addNumber("1");
                               },
                             ),
-                            UpiPinButton(text: "2", onTap: () {}),
-                            UpiPinButton(text: "3", onTap: () {}),
+                            UpiPinButton(
+                              text: "2",
+                              onTap: () {
+                                value.addNumber("2");
+                              },
+                            ),
+                            UpiPinButton(
+                              text: "3",
+                              onTap: () {
+                                value.addNumber("3");
+                              },
+                            ),
                           ],
                         ),
                         Row(
                           children: [
-                            UpiPinButton(text: "4", onTap: () {}),
-                            UpiPinButton(text: "5", onTap: () {}),
-                            UpiPinButton(text: "6", onTap: () {}),
+                            UpiPinButton(
+                              text: "4",
+                              onTap: () {
+                                value.addNumber("4");
+                              },
+                            ),
+                            UpiPinButton(
+                              text: "5",
+                              onTap: () {
+                                value.addNumber("5");
+                              },
+                            ),
+                            UpiPinButton(
+                              text: "6",
+                              onTap: () {
+                                value.addNumber("6");
+                              },
+                            ),
                           ],
                         ),
                         Row(
                           children: [
-                            UpiPinButton(text: "7", onTap: () {}),
-                            UpiPinButton(text: "8", onTap: () {}),
-                            UpiPinButton(text: "9", onTap: () {}),
+                            UpiPinButton(
+                              text: "7",
+                              onTap: () {
+                                value.addNumber("7");
+                              },
+                            ),
+                            UpiPinButton(
+                              text: "8",
+                              onTap: () {
+                                value.addNumber("8");
+                              },
+                            ),
+                            UpiPinButton(
+                              text: "9",
+                              onTap: () {
+                                value.addNumber("9");
+                              },
+                            ),
                           ],
                         ),
                         Row(
                           children: [
-                            UpiBackButton(onTap: () {}),
-                            UpiPinButton(text: "0", onTap: () {}),
+                            UpiBackButton(
+                              onTap: () {
+                                value.removeNumber();
+                              },
+                            ),
+                            UpiPinButton(
+                              text: "0",
+                              onTap: () {
+                                value.addNumber("0");
+                              },
+                            ),
                             UpiCheckButton(
                               onTap: () {
+                                if (!value.isUpiPinValid()) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      duration: Duration(milliseconds: 1500),
+                                      content: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.error_outline,
+                                            color: Colors.white,
+                                          ),
+                                          SizedBox(width: 10),
+                                          Text("Invalid UPI PIN"),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                  return;
+                                }
                                 showDialog(
                                   context: context,
                                   builder: ((context) {
