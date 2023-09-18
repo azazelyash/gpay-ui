@@ -4,6 +4,7 @@ import 'package:gpay_ui/screens/amount_screen/provider/dropdown.service.dart';
 import 'package:gpay_ui/screens/splash_screen/splash.screen.dart';
 import 'package:gpay_ui/screens/upi_pin_screen/provider/dropdown.service.dart';
 import 'package:gpay_ui/screens/upi_pin_screen/provider/upi.pin.provider.dart';
+import 'package:gpay_ui/screens/upi_pin_screen/upi.pin.screen.dart';
 import 'package:provider/provider.dart';
 
 void main() {

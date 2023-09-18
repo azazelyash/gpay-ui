@@ -1,8 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gpay_ui/constants.dart';
 import 'package:gpay_ui/screens/success_screen/success.screen.dart';
+import 'package:gpay_ui/screens/upi_pin_screen/components/custom.clipper.dart';
 import 'package:gpay_ui/screens/upi_pin_screen/components/upi.number.button.dart';
 import 'package:gpay_ui/screens/upi_pin_screen/components/upi.special.button.dart';
 import 'package:gpay_ui/screens/upi_pin_screen/models/tax.model.dart';
@@ -18,7 +21,201 @@ class UpiPinScreen extends StatefulWidget {
   State<UpiPinScreen> createState() => _UpiPinScreenState();
 }
 
-class _UpiPinScreenState extends State<UpiPinScreen> {
+class _UpiPinScreenState extends State<UpiPinScreen> with TickerProviderStateMixin {
+  late AnimationController _counterClockwiseRotationController;
+  late Animation<double> _counterClockwiseRotationAnimation;
+
+  late AnimationController _flipController;
+  late Animation<double> _flipAnimation;
+
+  void checkButton(UpiPinService value) async {
+    if (!value.isUpiPinValid()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          duration: Duration(milliseconds: 1500),
+          content: Row(
+            children: [
+              Icon(
+                Icons.error_outline,
+                color: Colors.white,
+              ),
+              SizedBox(width: 10),
+              Text("Invalid UPI PIN"),
+            ],
+          ),
+        ),
+      );
+      return;
+    }
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: ((context) {
+        _counterClockwiseRotationController
+          ..reset()
+          ..forward();
+
+        return AnimatedBuilder(
+          animation: _counterClockwiseRotationController,
+          builder: (context, child) {
+            return Transform(
+              alignment: Alignment.center,
+              transform: Matrix4.identity()
+                ..rotateZ(
+                  _counterClockwiseRotationAnimation.value,
+                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AnimatedBuilder(
+                    animation: _flipController,
+                    builder: (context, child) {
+                      return Transform(
+                        alignment: Alignment.centerRight,
+                        transform: Matrix4.identity()
+                          ..rotateY(
+                            _flipAnimation.value,
+                          ),
+                        child: ClipPath(
+                          clipper: const HalfCircleClipper(side: CircleSide.left),
+                          child: Container(
+                            color: kPrimaryColor,
+                            width: 50,
+                            height: 50,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  AnimatedBuilder(
+                    animation: _flipAnimation,
+                    builder: (context, child) {
+                      return Transform(
+                        alignment: Alignment.centerLeft,
+                        transform: Matrix4.identity()
+                          ..rotateY(
+                            _flipAnimation.value,
+                          ),
+                        child: ClipPath(
+                          clipper: const HalfCircleClipper(side: CircleSide.right),
+                          child: Container(
+                            color: kUpiPinColor,
+                            width: 50,
+                            height: 50,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      }),
+    );
+    await Future.delayed(
+      const Duration(seconds: 3),
+    );
+    if (context.mounted) {
+      Navigator.of(context).pop();
+      Navigator.of(context).pushReplacement(
+        CupertinoPageRoute(
+          builder: (context) => const SuccessScreen(),
+        ),
+      );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _counterClockwiseRotationController = AnimationController(
+      vsync: this,
+      duration: const Duration(
+        milliseconds: 500,
+      ),
+    );
+
+    _counterClockwiseRotationAnimation = Tween<double>(
+      begin: 0,
+      end: -(pi / 2.0),
+    ).animate(
+      CurvedAnimation(
+        parent: _counterClockwiseRotationController,
+        curve: Curves.bounceOut,
+      ),
+    );
+
+    // flip animation
+
+    _flipController = AnimationController(
+      vsync: this,
+      duration: const Duration(
+        milliseconds: 500,
+      ),
+    );
+
+    _flipAnimation = Tween<double>(
+      begin: 0,
+      end: pi,
+    ).animate(
+      CurvedAnimation(
+        parent: _flipController,
+        curve: Curves.bounceOut,
+      ),
+    );
+
+    // status listeners
+
+    _counterClockwiseRotationController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _flipAnimation = Tween<double>(
+          begin: _flipAnimation.value,
+          end: _flipAnimation.value + pi,
+        ).animate(
+          CurvedAnimation(
+            parent: _flipController,
+            curve: Curves.bounceOut,
+          ),
+        );
+
+        // reset the flip controller and start the animation
+
+        _flipController
+          ..reset()
+          ..forward();
+      }
+    });
+
+    _flipController.addStatusListener(
+      (status) {
+        if (status == AnimationStatus.completed) {
+          _counterClockwiseRotationAnimation = Tween<double>(
+            begin: _counterClockwiseRotationAnimation.value,
+            end: _counterClockwiseRotationAnimation.value + -(pi / 2.0),
+          ).animate(
+            CurvedAnimation(
+              parent: _counterClockwiseRotationController,
+              curve: Curves.bounceOut,
+            ),
+          );
+          _counterClockwiseRotationController
+            ..reset()
+            ..forward();
+        }
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _counterClockwiseRotationController.dispose();
+    _flipController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -146,6 +343,26 @@ class _UpiPinScreenState extends State<UpiPinScreen> {
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               child: Pinput(
+                                defaultPinTheme: PinTheme(
+                                  margin: const EdgeInsets.symmetric(horizontal: 2),
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  constraints: const BoxConstraints(
+                                    minHeight: 50,
+                                    minWidth: 50,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: Colors.grey,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  textStyle: const TextStyle(
+                                    color: kUpiPinColor,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                                 obscureText: value.isObscure,
                                 controller: value.upiPinController,
                                 keyboardType: TextInputType.none,
@@ -238,44 +455,7 @@ class _UpiPinScreenState extends State<UpiPinScreen> {
                             ),
                             UpiCheckButton(
                               onTap: () {
-                                if (!value.isUpiPinValid()) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      duration: Duration(milliseconds: 1500),
-                                      content: Row(
-                                        children: [
-                                          Icon(
-                                            Icons.error_outline,
-                                            color: Colors.white,
-                                          ),
-                                          SizedBox(width: 10),
-                                          Text("Invalid UPI PIN"),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                  return;
-                                }
-                                showDialog(
-                                  context: context,
-                                  builder: ((context) {
-                                    return const Center(
-                                      child: CircularProgressIndicator(
-                                        color: kUpiPinColor,
-                                      ),
-                                    );
-                                  }),
-                                );
-                                Future.delayed(
-                                  const Duration(seconds: 3),
-                                  () {
-                                    Navigator.of(context).pushReplacement(
-                                      CupertinoPageRoute(
-                                        builder: (context) => const SuccessScreen(),
-                                      ),
-                                    );
-                                  },
-                                );
+                                checkButton(value);
                               },
                             ),
                           ],
