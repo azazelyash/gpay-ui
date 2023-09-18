@@ -19,4 +19,5 @@ This Flutter project is a clone of Google Pay (GPay), focusing on replicating th
 <img src="./assets/Loader Animation.gif" alt="App Screenshot" height="500">
 
 <br>
-Created this custom loader animation using the ***AnimatedBuilder*** widget in flutter, the shape was created using the ***Custom Clipper Widget***, initially the offset was assigned and a arcToPoint was made from start to end points.
+
+Created this custom loader animation using the **_AnimatedBuilder_** widget in flutter, the shape was created using the **_Custom Clipper Widget_**, initially the offset was assigned and a arcToPoint was made from start to end points.
